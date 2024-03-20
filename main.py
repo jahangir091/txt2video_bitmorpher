@@ -5,9 +5,13 @@ from diffusers import TextToVideoZeroPipeline
 import time
 import uuid
 import os
+import requests
 
 
 from fastapi import FastAPI, Body
+
+txt2img_styles_res = requests.get('https://photolab-ai.com/media/giff/ai/txt2img_styles/txt2img_styles.json')
+styles_dict = txt2img_styles_res.json()
 
 # load stable diffusion model weights
 model_id = "runwayml/stable-diffusion-v1-5"
@@ -30,6 +34,8 @@ app.pipe = TextToVideoZeroPipeline.from_pretrained(
     cache_dir="models",
     return_cached_folder=True).to("cuda")
 
+app.txt2img_styles = styles_dict
+
 
 @app.post("/ai/api/v1/txt2video")
 def read_root(
@@ -37,6 +43,14 @@ def read_root(
         style_id: int = Body(1, title='style id'),
 ):
     start_time = time.time()
+
+    global_style_dict = next((d for d in app.txt2img_styles if d.get("id") == 1), None)
+    if style_id != 1:
+        style_dict = next((d for d in app.txt2img_styles if d.get("id") == style_id), None)
+        if style_dict:
+            prompt = style_dict['prompt'].format(prompt=prompt)
+    prompt += global_style_dict['prompt']
+    # negative_prompt += global_style_dict['negative_prompt']
 
     # generate the video using our pipeline
     result = app.pipe(prompt=prompt).images
