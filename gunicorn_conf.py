@@ -12,6 +12,9 @@ bind = 'unix:/run/txt2video/gunicorn.sock'
 workers = 1
 worker_class = 'uvicorn.workers.UvicornWorker'
 
+# Worker timeout
+timeout = 300
+
 # Logging Options
 loglevel = 'debug'
 accesslog = '/var/log/txt2video/access.log'
