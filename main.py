@@ -52,19 +52,28 @@ def read_root(
     prompt += global_style_dict['prompt']
     # negative_prompt += global_style_dict['negative_prompt']
 
-    # generate the video using our pipeline
-    result = app.pipe(prompt=prompt).images
-    result = [(r * 255).astype("uint8") for r in result]
-
     out_videos_directory_name = '/out_videos/'
     out_video_path = get_img_path(out_videos_directory_name)
 
-    # save the resulting image
-    imageio.mimsave(out_video_path, result, fps=8)
+    try:
+        # generate the video using our pipeline
+        result = app.pipe(prompt=prompt).images
+        result = [(r * 255).astype("uint8") for r in result]
+
+        # save the resulting image
+        imageio.mimsave(out_video_path, result, fps=8)
+
+        success = True
+        message = "Returned output successfully"
+    except Exception as e:
+        success = False
+        message = str(e)
+    finally:
+        torch.cuda.empty_cache()
 
     return {
-        "success": True,
-        "message": "Returned output successfully",
+        "success": success,
+        "message": message,
         "server_process_time": time.time() - start_time,
         "output_media_url": '/media' + out_videos_directory_name + out_video_path.split('/')[-1]
     }
