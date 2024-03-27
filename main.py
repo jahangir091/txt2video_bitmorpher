@@ -65,9 +65,11 @@ def read_root(
 
         success = True
         message = "Returned output successfully"
+        output_media_url = '/media' + out_videos_directory_name + out_video_path.split('/')[-1]
     except Exception as e:
         success = False
         message = str(e)
+        output_media_url = ''
     finally:
         torch.cuda.empty_cache()
 
@@ -75,7 +77,7 @@ def read_root(
         "success": success,
         "message": message,
         "server_process_time": time.time() - start_time,
-        "output_media_url": '/media' + out_videos_directory_name + out_video_path.split('/')[-1]
+        "output_media_url": output_media_url
     }
 
 
