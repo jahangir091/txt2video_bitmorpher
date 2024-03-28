@@ -38,7 +38,7 @@ app.txt2img_styles = styles_dict
 
 
 @app.post("/ai/api/v1/txt2video")
-def read_root(
+async def txt2video(
         prompt: str = Body("", title='prompt'),
         style_id: int = Body(1, title='style id'),
 ):
@@ -82,7 +82,7 @@ def read_root(
 
 
 @app.get("/ai/api/v1/txt2video-server-test")
-async def txt2video_server_test():
+def txt2video_server_test():
 
     return {
         "success": True,
